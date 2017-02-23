@@ -10,10 +10,14 @@ ENV CKAN_OPT /opt/ckan
 ENV CKAN_HOME /usr/lib/ckan/default
 ENV CKAN_CONFIG /etc/ckan/default/production.ini
 ENV CKAN_DATA /var/lib/ckan
+ENV CKAN_USER_LOGIN michi
+ENV CKAN_USER_PASSWORD michi
+ENV CKAN_USER_EMAIL michael.skrynski@dkd.de
 
 RUN mkdir -p $CKAN_OPT && \
     wget -nv $CKAN_REPO_URL -O $CKAN_OPT/$CKAN_VERSION && \
     dpkg -i $CKAN_OPT/$CKAN_VERSION && \
+    rm $CKAN_OPT/$CKAN_VERSION && \
     mkdir -p /var/log/supervisor && \
     mkdir -p /etc/supervisor/conf.d && \
     mkdir -p $CKAN_DATA && \

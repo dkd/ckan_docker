@@ -30,7 +30,7 @@ initialize_db () {
 add_sysadmin () {
   if [[ $("$CKAN_HOME"/bin/paster --plugin=ckan user michi -c "${CKAN_CONFIG}" | grep -e 'None$') == 'None' ]]; then
     echo "Adding Sysadmin accounts"
-    "$CKAN_HOME"/bin/paster --plugin=ckan user add michi password=michi email=zlorfi@gmail.com -c "${CKAN_CONFIG}"
+    "$CKAN_HOME"/bin/paster --plugin=ckan user add "${CKAN_USER_LOGIN}" password="${CKAN_USER_PASSWORD}" email="${CKAN_USER_EMAIL}" -c "${CKAN_CONFIG}"
     "$CKAN_HOME"/bin/paster --plugin=ckan sysadmin add michi -c "${CKAN_CONFIG}"
   fi
 }

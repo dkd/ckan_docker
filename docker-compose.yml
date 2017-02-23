@@ -4,7 +4,7 @@ version: '2.1'
 services:
   app:
     container_name: ckan_app
-    image: ckan_app:2.5.3
+    image: dkdde/ckan_app:2.5.3
     depends_on:
       - db
       - solr
@@ -30,7 +30,7 @@ services:
 
   solr:
     container_name: ckan_solr
-    image: ckan_solr:2.5.3-alpine
+    image: dkdde/ckan_solr:2.5.3-alpine
     ports:
       - "8983:8983"
 
