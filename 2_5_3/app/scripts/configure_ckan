@@ -1,0 +1,59 @@
+#!/bin/bash
+
+set -eu
+
+abort () {
+  echo "$@" >&2
+  exit 1
+}
+
+write_config () {
+  "$CKAN_HOME"/bin/paster --plugin=ckan config-tool "$CKAN_CONFIG" -e \
+      "sqlalchemy.url = ${DATABASE_URL}" \
+      "solr_url = ${SOLR_URL}" \
+      "ckan.storage_path = ${CKAN_DATA}" \
+      "email_to = disabled@example.com" \
+      "error_email_from = ckan@$(hostname -f)" \
+      "ckan.site_url = http://$(hostname -f)" \
+      "ckan.plugins = stats text_view image_view recline_view webpage_view"
+}
+
+initialize_db () {
+  if [ ! -e "$CKAN_OPT/db_initialize_complete" ]; then
+    echo "Initializing CKAN DB"
+    sleep 5
+    "$CKAN_HOME"/bin/paster --plugin=ckan db init -c "${CKAN_CONFIG}"
+    touch $CKAN_OPT/db_initialize_complete
+  fi
+}
+
+add_sysadmin () {
+  if [[ $("$CKAN_HOME"/bin/paster --plugin=ckan user michi -c "${CKAN_CONFIG}" | grep -e 'None$') == 'None' ]]; then
+    echo "Adding Sysadmin accounts"
+    "$CKAN_HOME"/bin/paster --plugin=ckan user add michi password=michi email=zlorfi@gmail.com -c "${CKAN_CONFIG}"
+    "$CKAN_HOME"/bin/paster --plugin=ckan sysadmin add michi -c "${CKAN_CONFIG}"
+  fi
+}
+
+link_postgres_url () {
+  local user=ckan_default
+  local pass=pass
+  local db=ckan_default
+  local host=db
+  local port=5432
+  echo "postgresql://${user}:${pass}@${host}:${port}/${db}"
+}
+
+link_solr_url () {
+  local host=solr
+  local port=8983
+  local core=ckan
+  echo "http://${host}:${port}/solr/${core}"
+}
+
+DATABASE_URL=$(link_postgres_url)
+SOLR_URL=$(link_solr_url)
+
+write_config
+initialize_db
+add_sysadmin
